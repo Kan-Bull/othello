@@ -1,4 +1,4 @@
-<p align="center">
+[create_pw_clean_terminal_demo.html](https://github.com/user-attachments/files/26381562/create_pw_clean_terminal_demo.html)<p align="center">
   <img src="https://img.shields.io/badge/Playwright-2D4F67?style=for-the-badge&logo=playwright&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/Biome-60A5FA?style=for-the-badge&logo=biome&logoColor=white" />
@@ -13,6 +13,62 @@
 </p>
 
 <br>
+
+[U<style>
+.term{background:#0f172a;border-radius:var(--border-radius-lg);overflow:hidden;font-family:var(--font-mono);font-size:13px;line-height:1.6}
+.term-bar{background:#1e293b;padding:8px 16px;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%}
+.term-body{padding:16px 20px;min-height:420px;color:#e2e8f0}
+.prompt{color:#22d3ee}
+.g{color:#4ade80}
+.y{color:#fbbf24}
+.d{color:#64748b}
+.cy{color:#22d3ee}
+.w{color:#e2e8f0}
+.spin{display:inline-block}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cursor{display:inline-block;width:8px;height:16px;background:#22d3ee;vertical-align:text-bottom;animation:blink 1s step-end infinite}
+.line{opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
+.line.show{opacity:1;transform:translateY(0)}
+</style>
+<div class="term">
+<div class="term-bar">
+<div class="dot" style="background:#ef4444"></div>
+<div class="dot" style="background:#fbbf24"></div>
+<div class="dot" style="background:#22c55e"></div>
+<span style="color:#94a3b8;font-size:12px;margin-left:8px">Terminal</span>
+</div>
+<div class="term-body" id="tb">
+<div class="line" id="l0"><span class="prompt">~/ </span><span class="w">npx create-pw-clean</span></div>
+<div class="line" id="l1"><br><span class="cy" style="font-weight:700">  ⚡ create-pw-clean</span> <span class="d">— scaffold a production-grade Playwright project</span></div>
+<div class="line" id="l2"><br><span class="d">  ?</span> <span class="w">Project name:</span> <span class="cy">edc-e2e-tests</span></div>
+<div class="line" id="l3"><span class="d">  ?</span> <span class="w">Application base URL:</span> <span class="cy">https://staging.creditlens.moody.com</span></div>
+<div class="line" id="l4"><span class="d">  ?</span> <span class="w">Include visual regression tests?</span> <span class="cy">Yes</span></div>
+<div class="line" id="l5"><span class="d">  ?</span> <span class="w">Include API helpers for setup/teardown?</span> <span class="cy">Yes</span></div>
+<div class="line" id="l6"><span class="d">  ?</span> <span class="w">Include GitHub Actions CI/CD?</span> <span class="cy">Yes</span></div>
+<div class="line" id="l7"><br>  <span class="g">✓</span> <span class="w">Scaffolded 36 files</span></div>
+<div class="line" id="l8">  <span class="g">✓</span> <span class="w">Dependencies installed</span></div>
+<div class="line" id="l9">  <span class="g">✓</span> <span class="w">Playwright browsers installed</span></div>
+<div class="line" id="l10">  <span class="g">✓</span> <span class="w">All files pass lint &amp; format</span></div>
+<div class="line" id="l11">  <span class="g">✓</span> <span class="w">Git repository initialized with first commit</span></div>
+<div class="line" id="l12"><br>  <span class="g" style="font-weight:700">✓ Project ready!</span></div>
+<div class="line" id="l13"><br>  <span style="font-weight:500;color:#e2e8f0">Get started:</span><br><br>    <span class="d">cd edc-e2e-tests</span><br>    <span class="d">code .</span></div>
+<div class="line" id="l14"><br><span class="prompt">~/ </span><span class="cursor"></span></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+<button onclick="replay()" style="font-size:13px">Replay</button>
+<span style="font-size:12px;color:var(--color-text-tertiary)">Animated terminal demo</span>
+</div>
+<script>
+const delays=[0,600,1200,1800,2100,2400,2700,3200,3800,4400,4800,5200,5700,6300,7000];
+function replay(){
+  for(let i=0;i<15;i++){const el=document.getElementById('l'+i);if(el)el.classList.remove('show')}
+  delays.forEach((d,i)=>{setTimeout(()=>{const el=document.getElementById('l'+i);if(el)el.classList.add('show')},d)})
+}
+replay();
+</script>ploading create_pw_clean_terminal_demo.html…]()
+
 
 ## What you get
 
