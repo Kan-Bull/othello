@@ -42,6 +42,7 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const kleur_1 = __importDefault(require("kleur"));
 const prompts_1 = __importDefault(require("prompts"));
+const scanner_1 = require("./scanner");
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 const DOCS_DIR = path.join(__dirname, "..", "docs");
 // ──────────────────────────────────────────────
@@ -71,6 +72,22 @@ function run(cmd, cwd) {
 //  Main
 // ──────────────────────────────────────────────
 async function main() {
+    const args = process.argv.slice(2);
+    // ── Subcommand: scan ──
+    if (args[0] === "scan") {
+        const url = args[1];
+        if (!url) {
+            console.log(kleur_1.default.red("\n  Usage: create-prologue scan <url>"));
+            console.log(kleur_1.default.dim("  Example: create-prologue scan https://example.com/contact\n"));
+            process.exit(1);
+        }
+        const testIdAttr = args.includes("--test-id-attr")
+            ? args[args.indexOf("--test-id-attr") + 1] || "data-testid"
+            : "data-testid";
+        await (0, scanner_1.scan)(url, testIdAttr);
+        return;
+    }
+    // ── Default: scaffold ──
     console.log();
     console.log(kleur_1.default.bold().cyan("  ⚡ create-prologue"), kleur_1.default.dim("— scaffold a production-grade Playwright project"));
     console.log();

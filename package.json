@@ -1,6 +1,6 @@
 {
   "name": "create-prologue",
-  "version": "1.1.2",
+  "version": "1.2",
   "description": "Scaffold a production-grade Playwright + TypeScript project with Page Object Model architecture",
   "bin": {
     "create-prologue": "./dist/index.js"
@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "prompts": "^2.4.2",
-    "kleur": "^4.1.5"
+    "kleur": "^4.1.5",
+    "playwright": "^1.48.0"
   }
 }
