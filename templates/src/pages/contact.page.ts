@@ -1,4 +1,3 @@
-import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { BasePage } from "../core/base.page";
 import type { ContactFormData } from "../data/types";
@@ -23,10 +22,6 @@ export class ContactPage extends BasePage {
   private readonly lastNameError = this.page.getByTestId("last-name-error");
   private readonly emailError = this.page.getByTestId("email-error");
   private readonly messageError = this.page.getByTestId("message-error");
-
-  constructor(page: Page) {
-    super(page);
-  }
 
   // -- Actions --
 

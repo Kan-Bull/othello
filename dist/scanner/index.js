@@ -56,11 +56,6 @@ function spinner(message) {
         },
     };
 }
-function stars(score) {
-    const filled = kleur_1.default.yellow("★".repeat(score));
-    const empty = kleur_1.default.dim("☆".repeat(5 - score));
-    return filled + empty;
-}
 function printResultsTable(locators) {
     console.log();
     console.log(kleur_1.default.bold("  Scan results:\n"));
@@ -69,15 +64,18 @@ function printResultsTable(locators) {
     const stratW = Math.max(10, ...locators.map((l) => l.strategy.length)) + 2;
     // Header
     const header = `  ${kleur_1.default.bold("Element".padEnd(nameW))}` +
-        `${kleur_1.default.bold("Strategy".padEnd(stratW))}` +
-        `${kleur_1.default.bold("Score")}`;
+        `${kleur_1.default.bold("Strategy".padEnd(stratW))}`;
     console.log(header);
-    console.log(kleur_1.default.dim(`  ${"─".repeat(nameW + stratW + 7)}`));
+    console.log(kleur_1.default.dim(`  ${"─".repeat(nameW + stratW)}`));
     // Rows
     for (const loc of locators) {
         const name = loc.variableName.padEnd(nameW);
-        const strategy = loc.strategy.padEnd(stratW);
-        console.log(`  ${name}${kleur_1.default.dim(strategy)}${stars(loc.score)}`);
+        const stratColor = loc.strategy.includes("TestId") || loc.strategy.includes("#id")
+            ? kleur_1.default.green
+            : loc.strategy.includes("Role") || loc.strategy.includes("Label")
+                ? kleur_1.default.yellow
+                : kleur_1.default.red;
+        console.log(`  ${name}${stratColor(loc.strategy.padEnd(stratW))}`);
     }
     console.log();
 }
@@ -134,11 +132,13 @@ async function scan(url, testIdAttr) {
         s3.stop(kleur_1.default.green(`✓ Page Object generated`));
         console.log(`\n  ${kleur_1.default.bold("File:")} ${kleur_1.default.cyan(outputPath)}`);
         // Summary
-        const avg = locators.reduce((sum, l) => sum + l.score, 0) / locators.length;
-        const scoreColor = avg >= 4 ? kleur_1.default.green : avg >= 2.5 ? kleur_1.default.yellow : kleur_1.default.red;
-        console.log(`  ${kleur_1.default.bold("Average score:")} ${scoreColor(avg.toFixed(1) + "/5")}`);
-        if (avg < 3) {
-            console.log(kleur_1.default.dim("\n  Tip: Add aria-labels or data-testid attributes to improve locator quality."));
+        const stable = locators.filter((l) => l.strategy === "getByTestId" || l.strategy === "locator#id").length;
+        const total = locators.length;
+        const pct = Math.round((stable / total) * 100);
+        const pctColor = pct >= 75 ? kleur_1.default.green : pct >= 50 ? kleur_1.default.yellow : kleur_1.default.red;
+        console.log(`  ${kleur_1.default.bold("Stable locators:")} ${pctColor(`${stable}/${total} (${pct}%)`)}`);
+        if (pct < 75) {
+            console.log(kleur_1.default.dim("\n  Tip: Add data-testid attributes to improve locator stability."));
         }
         console.log();
     }

@@ -22,12 +22,6 @@ function spinner(message: string): { stop: (result: string) => void } {
   };
 }
 
-function stars(score: number): string {
-  const filled = kleur.yellow("★".repeat(score));
-  const empty = kleur.dim("☆".repeat(5 - score));
-  return filled + empty;
-}
-
 function printResultsTable(locators: RankedLocator[]): void {
   console.log();
   console.log(kleur.bold("  Scan results:\n"));
@@ -39,16 +33,19 @@ function printResultsTable(locators: RankedLocator[]): void {
   // Header
   const header =
     `  ${kleur.bold("Element".padEnd(nameW))}` +
-    `${kleur.bold("Strategy".padEnd(stratW))}` +
-    `${kleur.bold("Score")}`;
+    `${kleur.bold("Strategy".padEnd(stratW))}`;
   console.log(header);
-  console.log(kleur.dim(`  ${"─".repeat(nameW + stratW + 7)}`));
+  console.log(kleur.dim(`  ${"─".repeat(nameW + stratW)}`));
 
   // Rows
   for (const loc of locators) {
     const name = loc.variableName.padEnd(nameW);
-    const strategy = loc.strategy.padEnd(stratW);
-    console.log(`  ${name}${kleur.dim(strategy)}${stars(loc.score)}`);
+    const stratColor = loc.strategy.includes("TestId") || loc.strategy.includes("#id")
+      ? kleur.green
+      : loc.strategy.includes("Role") || loc.strategy.includes("Label")
+        ? kleur.yellow
+        : kleur.red;
+    console.log(`  ${name}${stratColor(loc.strategy.padEnd(stratW))}`);
   }
 
   console.log();
@@ -119,13 +116,15 @@ export async function scan(url: string, testIdAttr: string): Promise<void> {
     console.log(`\n  ${kleur.bold("File:")} ${kleur.cyan(outputPath)}`);
 
     // Summary
-    const avg = locators.reduce((sum, l) => sum + l.score, 0) / locators.length;
-    const scoreColor = avg >= 4 ? kleur.green : avg >= 2.5 ? kleur.yellow : kleur.red;
-    console.log(`  ${kleur.bold("Average score:")} ${scoreColor(avg.toFixed(1) + "/5")}`);
+    const stable = locators.filter((l) => l.strategy === "getByTestId" || l.strategy === "locator#id").length;
+    const total = locators.length;
+    const pct = Math.round((stable / total) * 100);
+    const pctColor = pct >= 75 ? kleur.green : pct >= 50 ? kleur.yellow : kleur.red;
+    console.log(`  ${kleur.bold("Stable locators:")} ${pctColor(`${stable}/${total} (${pct}%)`)}`);
 
-    if (avg < 3) {
+    if (pct < 75) {
       console.log(
-        kleur.dim("\n  Tip: Add aria-labels or data-testid attributes to improve locator quality."),
+        kleur.dim("\n  Tip: Add data-testid attributes to improve locator stability."),
       );
     }
 

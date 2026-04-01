@@ -119,46 +119,46 @@ export function rankLocator(el: ElementInfo): RankedLocator {
     };
   }
 
-  // Strategy 2: getByRole with name
+  // Strategy 2: locator by ID — stable, language-independent
+  if (el.id && !isGeneratedId(el.id)) {
+    return {
+      element: el,
+      strategy: "locator#id",
+      code: `this.page.locator("#${escapeStr(el.id)}")`,
+      score: 4,
+      variableName: suggestVariableName(el),
+    };
+  }
+
+  // Strategy 3: getByRole with name — good semantics, but can break on locale change
   if (role && accessibleName) {
     const nameOpt = `{ name: "${escapeStr(accessibleName)}" }`;
     return {
       element: el,
       strategy: "getByRole",
       code: `this.page.getByRole("${role}", ${nameOpt})`,
-      score: 4,
-      variableName: suggestVariableName(el),
-    };
-  }
-
-  // Strategy 3: getByLabel
-  if (el.associatedLabel) {
-    return {
-      element: el,
-      strategy: "getByLabel",
-      code: `this.page.getByLabel("${escapeStr(el.associatedLabel)}")`,
-      score: 4,
-      variableName: suggestVariableName(el),
-    };
-  }
-
-  // Strategy 4: getByPlaceholder
-  if (el.placeholder) {
-    return {
-      element: el,
-      strategy: "getByPlaceholder",
-      code: `this.page.getByPlaceholder("${escapeStr(el.placeholder)}")`,
       score: 3,
       variableName: suggestVariableName(el),
     };
   }
 
-  // Strategy 5: locator by ID
-  if (el.id && !isGeneratedId(el.id)) {
+  // Strategy 4: getByLabel — can break on locale change
+  if (el.associatedLabel) {
     return {
       element: el,
-      strategy: "locator#id",
-      code: `this.page.locator("#${escapeStr(el.id)}")`,
+      strategy: "getByLabel",
+      code: `this.page.getByLabel("${escapeStr(el.associatedLabel)}")`,
+      score: 3,
+      variableName: suggestVariableName(el),
+    };
+  }
+
+  // Strategy 5: getByPlaceholder — can break on locale change
+  if (el.placeholder) {
+    return {
+      element: el,
+      strategy: "getByPlaceholder",
+      code: `this.page.getByPlaceholder("${escapeStr(el.placeholder)}")`,
       score: 2,
       variableName: suggestVariableName(el),
     };

@@ -1,6 +1,6 @@
-import { test } from "../../src/fixtures";
-import type { ContactFormData } from "../../src/data/types";
 import { ContactBuilder } from "../../src/data/builders/contact.builder";
+import type { ContactFormData } from "../../src/data/types";
+import { test } from "../../src/fixtures";
 
 const validContact: ContactFormData = {
   firstName: "John",
@@ -15,25 +15,19 @@ test.describe("Contact form @smoke", () => {
     await contactPage.navigate();
   });
 
-  test("should submit successfully with valid data", async ({
-    contactPage,
-  }) => {
+  test("should submit successfully with valid data", async ({ contactPage }) => {
     await contactPage.fillContactForm(validContact);
     await contactPage.submitForm();
     await contactPage.expectSuccessMessage();
   });
 
-  test("should submit successfully with random valid data", async ({
-    contactPage,
-  }) => {
+  test("should submit successfully with random valid data", async ({ contactPage }) => {
     await contactPage.fillContactForm(ContactBuilder.create().build());
     await contactPage.submitForm();
     await contactPage.expectSuccessMessage();
   });
 
-  test("should show validation errors for empty form", async ({
-    contactPage,
-  }) => {
+  test("should show validation errors for empty form", async ({ contactPage }) => {
     await contactPage.fillContactForm({
       ...validContact,
       email: "not-an-email",

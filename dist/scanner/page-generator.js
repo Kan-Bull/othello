@@ -75,7 +75,6 @@ function generatePageObject(url, pageTitle, locators) {
     const pagePath = parsed.pathname === "/" ? "/" : parsed.pathname.replace(/\/$/, "");
     deduplicateNames(locators);
     const lines = [];
-    lines.push('import { type Page } from "@playwright/test";');
     lines.push('import { BasePage } from "../core/base.page";');
     lines.push("");
     lines.push(`export class ${className} extends BasePage {`);
@@ -91,11 +90,6 @@ function generatePageObject(url, pageTitle, locators) {
         }
         lines.push("");
     }
-    // Constructor
-    lines.push("  constructor(page: Page) {");
-    lines.push("    super(page);");
-    lines.push("  }");
-    lines.push("");
     // TODO actions
     lines.push("  // ── Actions ──");
     lines.push("  // TODO: Add page actions here");

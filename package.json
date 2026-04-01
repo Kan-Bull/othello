@@ -1,6 +1,6 @@
 {
   "name": "create-prologue",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Scaffold a production-grade Playwright + TypeScript project with Page Object Model architecture",
   "bin": {
     "create-prologue": "./dist/index.js"
