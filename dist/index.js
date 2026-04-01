@@ -222,6 +222,11 @@ async function main() {
         if (fs.existsSync(tmplPath)) {
             fs.renameSync(tmplPath, pkgPath);
         }
+        // npm strips .gitignore from published packages, so we ship it as gitignore.tmpl
+        const giTmpl = path.join(targetDir, "gitignore.tmpl");
+        if (fs.existsSync(giTmpl)) {
+            fs.renameSync(giTmpl, path.join(targetDir, ".gitignore"));
+        }
         // Add Faker.js to package.json if requested
         if (config.includeFaker) {
             const pkgContent = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
