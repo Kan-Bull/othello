@@ -261,24 +261,32 @@ async function main(): Promise<void> {
     console.log(kleur.dim("    npx playwright install --with-deps chromium\n"));
   }
 
-  // ── Step 4: Lint check ──
-  const s4 = spinner("Verifying code quality (biome check)...");
-  try {
-    run("npx @biomejs/biome check .", targetDir);
-    s4.stop(kleur.green("✓ All files pass lint & format"));
-  } catch {
-    s4.stop(kleur.yellow("⚠ Some lint issues found (run npm run lint:fix)"));
-  }
-
-  // ── Step 5: Git init ──
-  const s5 = spinner("Initializing git repository...");
+  // ── Step 4: Git init (before lint — biome needs a git repo for vcs config) ──
+  const s4 = spinner("Initializing git repository...");
   try {
     run("git init", targetDir);
+    s4.stop(kleur.green("✓ Git repository initialized"));
+  } catch {
+    s4.stop(kleur.yellow("⚠ Git init skipped (git not available)"));
+  }
+
+  // ── Step 5: Lint check ──
+  const s5 = spinner("Verifying code quality (biome check)...");
+  try {
+    run("npx @biomejs/biome check .", targetDir);
+    s5.stop(kleur.green("✓ All files pass lint & format"));
+  } catch {
+    s5.stop(kleur.yellow("⚠ Some lint issues found (run npm run lint:fix)"));
+  }
+
+  // ── Step 6: Git commit ──
+  const s6 = spinner("Creating initial commit...");
+  try {
     run("git add -A", targetDir);
     run('git commit -m "Initial scaffold via create-prologue"', targetDir);
-    s5.stop(kleur.green("✓ Git repository initialized with first commit"));
+    s6.stop(kleur.green("✓ Initial commit created"));
   } catch {
-    s5.stop(kleur.yellow("⚠ Git init skipped (git not available)"));
+    s6.stop(kleur.yellow("⚠ Git commit skipped"));
   }
 
   // ── Done ──
