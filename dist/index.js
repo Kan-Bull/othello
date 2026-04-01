@@ -42,6 +42,7 @@ const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const kleur_1 = __importDefault(require("kleur"));
 const prompts_1 = __importDefault(require("prompts"));
+const analyzer_1 = require("./analyzer");
 const scanner_1 = require("./scanner");
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 const DOCS_DIR = path.join(__dirname, "..", "docs");
@@ -78,18 +79,36 @@ function printUsage() {
     console.log(kleur_1.default.bold("  Commands:\n"));
     console.log("    othello create               Scaffold a new Playwright project");
     console.log("    othello scan <url>           Analyze a page and generate a Page Object");
+    console.log("    othello analyze <url>        Generate a test plan from a live page");
     console.log();
     console.log(kleur_1.default.bold("  Options:\n"));
     console.log("    scan --test-id-attr <attr>   Custom test ID attribute (default: data-testid)");
+    console.log("    analyze --output <path>      Custom output path for generated spec");
     console.log();
     console.log(kleur_1.default.bold("  Examples:\n"));
     console.log(kleur_1.default.dim("    npx othello create"));
     console.log(kleur_1.default.dim("    npx othello scan https://myapp.com/login"));
     console.log(kleur_1.default.dim("    npx othello scan https://myapp.com/login --test-id-attr data-cy"));
+    console.log(kleur_1.default.dim("    npx othello analyze https://myapp.com/contact"));
     console.log();
 }
 async function main() {
     const args = process.argv.slice(2);
+    // ── Subcommand: analyze ──
+    if (args[0] === "analyze") {
+        const url = args[1];
+        if (!url) {
+            console.log(kleur_1.default.red("\n  Usage: othello analyze <url> [--output <path>]"));
+            console.log(kleur_1.default.dim("  Example: othello analyze https://example.com/contact\n"));
+            process.exit(1);
+        }
+        const outputIdx = args.indexOf("--output");
+        const outputIdxShort = args.indexOf("-o");
+        const oIdx = outputIdx >= 0 ? outputIdx : outputIdxShort;
+        const outputPath = oIdx >= 0 ? args[oIdx + 1] : undefined;
+        await (0, analyzer_1.analyze)(url, outputPath);
+        return;
+    }
     // ── Subcommand: scan ──
     if (args[0] === "scan") {
         const url = args[1];

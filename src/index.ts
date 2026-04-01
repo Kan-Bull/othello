@@ -5,6 +5,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import kleur from "kleur";
 import prompts from "prompts";
+import { analyze } from "./analyzer";
 import { scan } from "./scanner";
 
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
@@ -59,19 +60,38 @@ function printUsage(): void {
   console.log(kleur.bold("  Commands:\n"));
   console.log("    othello create               Scaffold a new Playwright project");
   console.log("    othello scan <url>           Analyze a page and generate a Page Object");
+  console.log("    othello analyze <url>        Generate a test plan from a live page");
   console.log();
   console.log(kleur.bold("  Options:\n"));
   console.log("    scan --test-id-attr <attr>   Custom test ID attribute (default: data-testid)");
+  console.log("    analyze --output <path>      Custom output path for generated spec");
   console.log();
   console.log(kleur.bold("  Examples:\n"));
   console.log(kleur.dim("    npx othello create"));
   console.log(kleur.dim("    npx othello scan https://myapp.com/login"));
   console.log(kleur.dim("    npx othello scan https://myapp.com/login --test-id-attr data-cy"));
+  console.log(kleur.dim("    npx othello analyze https://myapp.com/contact"));
   console.log();
 }
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
+
+  // ── Subcommand: analyze ──
+  if (args[0] === "analyze") {
+    const url = args[1];
+    if (!url) {
+      console.log(kleur.red("\n  Usage: othello analyze <url> [--output <path>]"));
+      console.log(kleur.dim("  Example: othello analyze https://example.com/contact\n"));
+      process.exit(1);
+    }
+    const outputIdx = args.indexOf("--output");
+    const outputIdxShort = args.indexOf("-o");
+    const oIdx = outputIdx >= 0 ? outputIdx : outputIdxShort;
+    const outputPath = oIdx >= 0 ? args[oIdx + 1] : undefined;
+    await analyze(url, outputPath);
+    return;
+  }
 
   // ── Subcommand: scan ──
   if (args[0] === "scan") {
