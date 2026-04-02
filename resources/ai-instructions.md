@@ -51,10 +51,10 @@ Always import `test` and `expect` from the project fixtures, **never** from `@pl
 
 ```typescript
 // CORRECT
-import { test } from '../../src/fixtures';
+import { test, expect } from '../../src/fixtures';
 
 // WRONG
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 ```
 
 ### Structure
@@ -139,19 +139,21 @@ Reusable UI patterns (modals, tables, forms, toasts) extend `BaseComponent`:
 import { BaseComponent } from '../core/base.component';
 
 export class ModalComponent extends BaseComponent {
-  private readonly title = this.root.getByTestId('modal-title');
-  private readonly confirmButton = this.root.getByRole('button', { name: 'Confirm' });
+  private readonly title = this.locator('[data-testid="modal-title"]');
+  private readonly confirmButton = this.locator('[data-testid="modal-confirm"]');
 
   async confirm(): Promise<void> {
-    await this.click(this.confirmButton, 'Confirm button');
+    this.log.action('Confirm modal');
+    await this.confirmButton.click();
+    await this.waitForHidden();
   }
 }
 ```
 
-Components are composed into Page Objects:
+Components use `this.locator()` (scoped to the root element) and direct Playwright calls on locators. They are composed into Page Objects:
 
 ```typescript
-readonly confirmModal = new ModalComponent(this.page, this.page.getByTestId('confirm-modal'));
+readonly confirmModal = new ModalComponent(this.page, this.page.locator('[data-testid="confirm-modal"]'));
 ```
 
 ## Naming Conventions
@@ -208,6 +210,8 @@ export const test = base.extend<TestFixtures>({
     await use(new DashboardPage(page));
   },
 });
+
+export { expect } from '../utils/custom-matchers';
 ```
 
 **Every new Page Object must be registered here.** Tests receive pages via parameter destructuring.
