@@ -95,7 +95,11 @@ async function main(): Promise<void> {
     const testIdAttr = args.includes("--test-id-attr")
       ? args[args.indexOf("--test-id-attr") + 1] || "data-testid"
       : "data-testid";
-    await scan(url, testIdAttr);
+    const headed = args.includes("--headed");
+    const authFile = args.includes("--auth")
+      ? args[args.indexOf("--auth") + 1]
+      : undefined;
+    await scan(url, testIdAttr, { headed, authFile });
     return;
   }
 

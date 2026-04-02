@@ -1,4 +1,5 @@
 import * as fs from "node:fs";
+import * as readline from "node:readline";
 import { chromium } from "playwright";
 import kleur from "kleur";
 import { analyzeElements } from "./page-analyzer";
@@ -51,7 +52,12 @@ function printResultsTable(locators: RankedLocator[]): void {
   console.log();
 }
 
-export async function scan(url: string, testIdAttr: string): Promise<void> {
+interface ScanOptions {
+  headed?: boolean;
+  authFile?: string;
+}
+
+export async function scan(url: string, testIdAttr: string, options: ScanOptions = {}): Promise<void> {
   console.log();
   console.log(
     kleur.bold().cyan("  🔍 histrion scan"),
@@ -68,18 +74,35 @@ export async function scan(url: string, testIdAttr: string): Promise<void> {
     process.exit(1);
   }
 
+  // Validate auth file
+  if (options.authFile) {
+    if (!fs.existsSync(options.authFile)) {
+      console.log(kleur.red(`  ✗ Auth file not found: ${options.authFile}`));
+      process.exit(1);
+    }
+    try {
+      JSON.parse(fs.readFileSync(options.authFile, "utf-8"));
+    } catch {
+      console.log(kleur.red(`  ✗ Invalid auth file: ${options.authFile} (expected Playwright storage state)`));
+      process.exit(1);
+    }
+  }
+
   // Launch browser
   const s1 = spinner(`Opening ${parsedUrl.href}...`);
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: !options.headed });
   } catch {
     s1.stop(kleur.red("✗ Failed to launch browser. Run: npx playwright install chromium"));
     process.exit(1);
   }
 
   try {
-    const page = await browser.newPage();
+    const context = options.authFile
+      ? await browser.newContext({ storageState: options.authFile })
+      : await browser.newContext();
+    const page = await context.newPage();
 
     try {
       await page.goto(parsedUrl.href, { timeout: 30_000, waitUntil: "networkidle" });
@@ -90,6 +113,22 @@ export async function scan(url: string, testIdAttr: string): Promise<void> {
 
     const pageTitle = await page.title();
     s1.stop(kleur.green(`✓ Page loaded — "${pageTitle}"`));
+
+    // In headed mode, let the user navigate and log in manually
+    if (options.headed) {
+      console.log();
+      console.log(kleur.dim("  Browser is open. Log in, navigate to the target page,"));
+      console.log(kleur.dim("  then press Enter here to scan.\n"));
+
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      await new Promise<void>((resolve) => rl.question("  Press Enter to scan...", () => { rl.close(); resolve(); }));
+
+      // Show what we're actually scanning
+      const scanUrl = page.url();
+      const scanTitle = await page.title();
+      console.log();
+      console.log(kleur.bold(`  Scanning: ${scanUrl} — "${scanTitle}"`));
+    }
 
     // Analyze
     const s2 = spinner("Scanning interactive elements...");
