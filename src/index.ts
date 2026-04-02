@@ -135,7 +135,7 @@ async function main(): Promise<void> {
       {
         type: "confirm",
         name: "includeExamples",
-        message: "Include example files? (Contact page, test & builder for practicesoftwaretesting.com)",
+        message: "Include starter template files? (Page Object, fixture & test boilerplate to get started)",
         initial: true,
       },
       {
@@ -217,13 +217,13 @@ async function main(): Promise<void> {
       fs.writeFileSync(pkgPath, JSON.stringify(pkgContent, null, 2) + "\n");
     }
 
-    // Remove example files if not requested
+    // Remove starter template files if not requested
     if (!config.includeExamples) {
-      removeFile(path.join(targetDir, "src", "pages", "contact.page.ts"));
-      removeFile(path.join(targetDir, "src", "data", "builders", "contact.builder.ts"));
-      removeFile(path.join(targetDir, "tests", "e2e", "contact.spec.ts"));
+      removeFile(path.join(targetDir, "src", "pages", "example.page.ts"));
+      removeFile(path.join(targetDir, "src", "data", "types", "example.ts"));
+      removeFile(path.join(targetDir, "tests", "e2e", "example.spec.ts"));
 
-      // Reset fixtures to an empty shell without ContactPage
+      // Reset fixtures to an empty shell
       const fixturesPath = path.join(targetDir, "src", "fixtures", "index.ts");
       fs.writeFileSync(
         fixturesPath,
@@ -254,18 +254,11 @@ async function main(): Promise<void> {
         ].join("\n"),
       );
 
-      // Strip ContactFormData from types if no examples
+      // Strip ExampleData re-export from types
       const typesPath = path.join(targetDir, "src", "data", "types", "index.ts");
       let typesContent = fs.readFileSync(typesPath, "utf-8");
-      typesContent = typesContent.replace(/\/\/ Contact dropdown.*?\n/s, "");
-      typesContent = typesContent.replace(/export type ContactSubject[\s\S]*?;\n\n/m, "");
-      typesContent = typesContent.replace(/export interface ContactFormData[\s\S]*?}\n\n/m, "");
+      typesContent = typesContent.replace(/export type \{ ExampleData \}.*\n\n?/m, "");
       fs.writeFileSync(typesPath, typesContent);
-    }
-
-    // Remove Faker-dependent builder if Faker not included but examples are
-    if (!config.includeFaker && config.includeExamples) {
-      removeFile(path.join(targetDir, "src", "data", "builders", "contact.builder.ts"));
     }
 
     if (!config.includeVisual) {
@@ -370,14 +363,14 @@ async function main(): Promise<void> {
   console.log("");
 
   if (config.includeExamples) {
-    console.log(kleur.bold("  Example tests included:\n"));
+    console.log(kleur.bold("  Starter templates included:\n"));
     console.log(
-      kleur.dim("    The project includes a Contact page example based on"),
+      kleur.dim("    The project includes Page Object, fixture & test"),
     );
     console.log(
-      kleur.dim("    https://practicesoftwaretesting.com — run them to see"),
+      kleur.dim("    boilerplate in src/pages/example.page.ts — open it"),
     );
-    console.log(kleur.dim("    the framework in action.\n"));
+    console.log(kleur.dim("    and follow docs/15-writing-your-first-test.md.\n"));
   }
 
   if (config.includeFaker) {
@@ -450,7 +443,7 @@ function printStructure(config: ProjectConfig): void {
     "  ├── core/            Base classes (BasePage, BaseComponent, BaseAPI)",
     "  ├── components/      Reusable UI components (Table, Modal, Form...)",
     config.includeExamples
-      ? "  ├── pages/           Page Objects (Contact example included)"
+      ? "  ├── pages/           Page Objects (starter template included)"
       : "  ├── pages/           Page Objects (one per page)",
     "  ├── fixtures/        Playwright fixture injection",
     config.includeApi ? "  ├── api/             API clients for setup/teardown" : null,
@@ -460,7 +453,7 @@ function printStructure(config: ProjectConfig): void {
     "  └── utils/           Logger, custom matchers, visual helpers",
     "  tests/",
     config.includeExamples
-      ? "  ├── e2e/             End-to-end specs (Contact example included)"
+      ? "  ├── e2e/             End-to-end specs (starter template included)"
       : "  ├── e2e/             End-to-end specs",
     config.includeVisual ? "  └── visual/          Visual regression specs" : null,
   ].filter(Boolean);
