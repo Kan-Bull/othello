@@ -16,6 +16,7 @@ The structured logger gives you a timestamped, color-coded trace of every action
 ```
 
 Each line shows:
+
 - **Timestamp** — when the action happened
 - **Context** — which Page Object or Component produced the log
 - **Level icon** — what kind of action it is
@@ -23,13 +24,13 @@ Each line shows:
 
 ## Log levels
 
-| Level | Icon | Use for |
-|-------|------|---------|
-| `step` | 🔹 | High-level actions: navigate, fill form, submit |
-| `action` | ▸ | Granular interactions: click, fill a single field, select |
-| `success` | ✓ | Assertions that passed |
-| `warn` | ⚠ | Non-fatal warnings |
-| `error` | ✗ | Failures |
+| Level     | Icon | Use for                                                   |
+| --------- | ---- | --------------------------------------------------------- |
+| `step`    | 🔹   | High-level actions: navigate, fill form, submit           |
+| `action`  | ▸    | Granular interactions: click, fill a single field, select |
+| `success` | ✓    | Assertions that passed                                    |
+| `warn`    | ⚠    | Non-fatal warnings                                        |
+| `error`   | ✗    | Failures                                                  |
 
 `action` logs are indented under their parent `step` to create a visual hierarchy.
 
@@ -41,13 +42,13 @@ Every `BasePage`, `BaseComponent`, and `BaseAPI` class has a `this.log` instance
 
 ```typescript
 export class CheckoutPage extends BasePage {
-  readonly path = '/checkout';
+  readonly path = "/checkout";
   readonly pageTitle = /Checkout/;
 
   async placeOrder(): Promise<void> {
-    this.log.step('Placing order');
-    await this.click(this.confirmButton, 'Confirm');
-    this.log.success('Order placed');
+    this.log.step("Placing order");
+    await this.click(this.confirmButton, "Confirm");
+    this.log.success("Order placed");
   }
 }
 ```
@@ -70,7 +71,7 @@ export class CartComponent extends BaseComponent {
 export class OrderAPI extends BaseAPI {
   async createOrder(data: Order): Promise<string> {
     this.log.step(`Creating order via API`);
-    const response = await this.post('/orders', data);
+    const response = await this.post("/orders", data);
     this.log.success(`Order created: ${response.id}`);
     return response.id;
   }
@@ -87,11 +88,11 @@ Edit the `THEME` object to swap ANSI codes:
 
 ```typescript
 const THEME: Record<LogLevel, { color: string; icon: string }> = {
-  step:    { color: CYAN,   icon: '🔹' },
-  action:  { color: DIM,    icon: ' ▸ ' },
-  success: { color: GREEN,  icon: '✓' },
-  warn:    { color: YELLOW, icon: '⚠' },
-  error:   { color: RED,    icon: '✗' },
+  step: { color: CYAN, icon: "🔹" },
+  action: { color: DIM, icon: " ▸ " },
+  success: { color: GREEN, icon: "✓" },
+  warn: { color: YELLOW, icon: "⚠" },
+  error: { color: RED, icon: "✗" },
 };
 ```
 
@@ -110,7 +111,7 @@ success: { color: GREEN,  icon: '✔' },
 1. Add it to the `LogLevel` type:
 
 ```typescript
-type LogLevel = 'step' | 'action' | 'success' | 'warn' | 'error' | 'debug';
+type LogLevel = "step" | "action" | "success" | "warn" | "error" | "debug";
 ```
 
 2. Add a theme entry:
@@ -132,11 +133,11 @@ debug(message: string): void {
 Edit the `toLocaleTimeString` options in the `print` method:
 
 ```typescript
-const time = new Date().toLocaleTimeString('en-US', {
+const time = new Date().toLocaleTimeString("en-US", {
   hour12: false,
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
 });
 ```
 
