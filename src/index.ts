@@ -5,6 +5,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import kleur from "kleur";
 import prompts from "prompts";
+import { extract } from "./extractor";
 import { scan } from "./scanner";
 
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
@@ -68,6 +69,7 @@ function printUsage(): void {
   console.log(kleur.bold("  Commands:\n"));
   console.log("    histrion create [name|.]       Scaffold a new Playwright project");
   console.log("    histrion scan <url>           Analyze a page and generate a Page Object");
+  console.log("    histrion extract '<html>'     Extract all locators from a copied HTML element");
   console.log();
   console.log(kleur.bold("  Options:\n"));
   console.log("    scan --test-id-attr <attr>   Custom test ID attribute (default: data-testid)");
@@ -82,11 +84,42 @@ function printUsage(): void {
   console.log(kleur.dim("    npx histrion scan https://myapp.com/login --test-id-attr data-cy"));
   console.log(kleur.dim("    npx histrion scan https://myapp.com/settings --headed"));
   console.log(kleur.dim("    npx histrion scan https://myapp.com/settings --auth auth/admin.json"));
+  console.log(kleur.dim(`    npx histrion extract '<button id="login" class="btn btn-primary">Sign In</button>'`));
+  console.log(kleur.dim(`    echo '<div data-testid="alert">' | npx histrion extract`));
   console.log();
 }
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
+
+  // ── Subcommand: extract ──
+  if (args[0] === "extract") {
+    const htmlArg = args.slice(1).join(" ");
+
+    // Support piped input: echo '<div>' | npx histrion extract
+    if (!htmlArg && !process.stdin.isTTY) {
+      const chunks: Buffer[] = [];
+      for await (const chunk of process.stdin) {
+        chunks.push(chunk);
+      }
+      const piped = Buffer.concat(chunks).toString("utf-8").trim();
+      if (!piped) {
+        console.log(kleur.red("\n  Usage: histrion extract '<html_element>'"));
+        console.log(kleur.dim("  Example: histrion extract '<button id=\"login\">Sign In</button>'\n"));
+        process.exit(1);
+      }
+      extract(piped);
+      return;
+    }
+
+    if (!htmlArg) {
+      console.log(kleur.red("\n  Usage: histrion extract '<html_element>'"));
+      console.log(kleur.dim("  Example: histrion extract '<button id=\"login\">Sign In</button>'\n"));
+      process.exit(1);
+    }
+    extract(htmlArg);
+    return;
+  }
 
   // ── Subcommand: scan ──
   if (args[0] === "scan") {

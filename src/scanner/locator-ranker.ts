@@ -16,7 +16,7 @@ const IMPLICIT_ROLES: Record<string, string> = {
   textarea: "textbox",
 };
 
-function getImplicitRole(el: ElementInfo): string | null {
+export function getImplicitRole(el: ElementInfo): string | null {
   if (el.role) return el.role;
 
   if (el.tagName === "input") {
@@ -38,11 +38,11 @@ function getImplicitRole(el: ElementInfo): string | null {
   return IMPLICIT_ROLES[el.tagName] || null;
 }
 
-function getAccessibleName(el: ElementInfo): string | null {
+export function getAccessibleName(el: ElementInfo): string | null {
   return el.ariaLabel || el.ariaLabelledBy || el.associatedLabel || el.visibleText || null;
 }
 
-function isGeneratedId(id: string): boolean {
+export function isGeneratedId(id: string): boolean {
   // UUIDs, hex strings, or strings with lots of digits
   if (/[0-9a-f]{8,}/i.test(id)) return true;
   if (/^\d+$/.test(id)) return true;
@@ -69,7 +69,7 @@ function toVariableName(raw: string): string {
     .join("");
 }
 
-function suggestVariableName(el: ElementInfo): string {
+export function suggestVariableName(el: ElementInfo): string {
   // Prefer code-level attributes (always English) over visible text (can be localized)
   const source =
     el.testId ||
@@ -100,7 +100,7 @@ function suggestVariableName(el: ElementInfo): string {
   return name;
 }
 
-function escapeStr(s: string): string {
+export function escapeStr(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
