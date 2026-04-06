@@ -1,12 +1,13 @@
 {
   "name": "histrion",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "description": "Scaffold a production-grade Playwright + TypeScript project with Page Object Model architecture",
   "bin": {
     "histrion": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
+    "test": "vitest run",
     "prepare": "npm run build",
     "dev": "ts-node src/index.ts"
   },
@@ -30,11 +31,13 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/prompts": "^2.4.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^4.1.2"
   },
   "dependencies": {
-    "prompts": "^2.4.2",
+    "commander": "^14.0.3",
     "kleur": "^4.1.5",
-    "playwright": "^1.48.0"
+    "playwright": "^1.48.0",
+    "prompts": "^2.4.2"
   }
 }
